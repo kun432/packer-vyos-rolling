@@ -1,0 +1,79 @@
+{
+  "variables": {
+    "iso_url": "{{env `ISO_IMAGE`}}",
+    "iso_checksum": "{{env `ISO_SHA256_SUM`}}",
+    "output_directory": "{{env `PACKER_BUILD_DIR`}}",
+    "box_dir": "{{env `BOX_DIR`}}"
+  },
+  "builders":
+  [
+    {
+      "name": "virtualbox",
+      "vm_name": "vyos",
+      "boot_wait": "30s",
+      "disk_size": 4096,
+      "guest_os_type": "Linux_64",
+      "iso_url": "{{user `iso_url`}}",
+      "iso_checksum": "sha256:{{user `iso_checksum`}}",
+      "output_directory": "{{user `output_directory`}}",
+      "shutdown_command": "sudo halt -p",
+      "ssh_username": "vagrant",
+      "ssh_password": "vagrant",
+      "ssh_port": 22,
+      "ssh_host_port_min": 2222,
+      "ssh_host_port_max": 2229,
+      "ssh_wait_timeout": "3000s",
+      "type": "virtualbox-iso",
+      "vboxmanage": [
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--memory",
+          "512"
+        ],
+        [
+          "modifyvm",
+          "{{.Name}}",
+          "--cpus",
+          "1"
+        ]
+      ],
+      "boot_command":
+      [
+        "<enter><wait10>",
+        "<wait10><wait10><wait10><wait10><wait10>",
+        "vyos<enter><wait10>",
+        "vyos<wait><enter><wait10>",
+        "install image<enter><wait5>",
+        "<enter><wait10>",
+        "<enter><wait5>",
+        "<enter><wait5>",
+        "Yes<enter><wait5>",
+        "<enter><wait10><wait10>",
+        "<enter><wait5>",
+        "<enter><wait5>",
+        "vagrant<enter><wait10>",
+        "vagrant<enter><wait10>",
+        "<enter><wait10><wait10>",
+        "reboot<enter><wait5>",
+        "Yes<enter><wait10>",
+        "<wait10><wait10><wait10><wait10><wait10>",
+        "vyos<enter><wait10>",
+        "vagrant<enter><wait10>",
+        "configure<enter><wait5>",
+        "delete system console<enter><wait>",
+        "set interface ethernet eth0 address dhcp<enter><wait5>",
+        "set system name-servers-dhcp eth0<enter><wait5>",
+        "set system login user vagrant authentication plaintext-password vagrant<enter><wait5>",
+        "set service ssh<enter><wait5>",
+        "commit<enter><wait5>",
+        "save<enter><wait5>",
+        "delete interface ethernet eth0 hw-id<enter><wait5>",
+        "commit<enter><wait5>",
+        "save<enter><wait5>",
+        "exit<enter><wait5>",
+        "exit<enter><wait5>"
+      ]
+    }
+  ]
+}
