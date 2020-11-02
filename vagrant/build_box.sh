@@ -2,7 +2,7 @@
 
 SCRIPT_PATH=`realpath $0`
 SCRIPT_BASE=`dirname ${SCRIPT_PATH}`
-BASE_DIR="${SCRIPT_BASE}/../"
+BASE_DIR="${SCRIPT_BASE}/.."
 cd ${BASE_DIR} || exit 1
 
 export ISO_IMAGE="$(ls -t iso/*.iso | head -1)"
@@ -28,8 +28,26 @@ mv vyos.ovf box.ovf
 tar cf ${BOX_DIR}/vyos.box box.ovf vyos-disk001.vmdk Vagrantfile metadata.json
 cd ${BASE_DIR}
 
-if vagrant box list | grep '^vyos '
+cat <<EOF | tee ${BOX_DIR}/vyos.json
+{
+  "name": "kun432/vyos",
+  "description": "vyos rolling release vagrant box for virtualbox",
+  "versions": [
+    {
+      "version": "${VERSION}",
+      "providers": [
+        {
+          "name": "virtualbox",
+          "url": "${BOX_DIR}/vyos.box"
+        }
+      ]
+    }
+  ]
+}
+EOF
+
+if vagrant box list | grep '^kun432/vyos '
 then
-	vagrant box remove -f vyos
+	vagrant box remove --all -f kun432/vyos
 fi
-vagrant box add --name kun432/vyos ${BOX_DIR}/vyos.box
+vagrant box add --name kun432/vyos ${BOX_DIR}/vyos.json

@@ -45,6 +45,7 @@ iso/*.iso
 iso/*.iso.sha256
 
 box/*.box
+box/*.json
 
 packer_build/
 packer_build.log
